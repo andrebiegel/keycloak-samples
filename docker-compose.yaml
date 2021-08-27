@@ -1,0 +1,36 @@
+version: '3.9'
+
+
+services:
+  postgres:
+      image: postgres
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+  keycloak:
+      image: quay.io/keycloak/keycloak:15.0.2   
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_SCHEMA: public
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/extensions-sample-realm.json
+        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+        #JDBC_PARAMS: "ssl=true"
+        DEBUG: 'true'
+        DEBUG_PORT: '*:8787'
+      ports:
+        - 8080:8080
+        - 8787:8787
+      depends_on:
+        - postgres
+      volumes:
+        - "./infrastructure/keycloak/imports:/opt/jboss/keycloak/imports"
+        - "./infrastructure/keycloak/deployments:/opt/jboss/keycloak/standalone/deployments/"
+        #- "./infrastructure/keycloak/scripts:/opt/jboss/startup-scripts" also possible
+      
